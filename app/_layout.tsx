@@ -14,7 +14,8 @@ import { TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import * as SecureStore from 'expo-secure-store';
-const CLERK_PUBLISHABLE_KEY = process.env.CLERK_PUBLISHABLE_KEY
+import { ClerkProvider, useAuth } from "@clerk/clerk-expo";
+const CLERK_PUBLISHABLE_KEY = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY
 
 const tokenCache = {
   async getToken(key:string) {
@@ -28,7 +29,7 @@ const tokenCache = {
     try {
       return SecureStore.setItemAsync(key,value)
     } catch(err) {
-      return null;
+      return;
     }
   }
 }
@@ -70,12 +71,24 @@ export default function RootLayout() {
     return null;
   }
 
-  return <RootLayoutNav />;
+  return(
+    <ClerkProvider tokenCache={tokenCache} publishableKey={CLERK_PUBLISHABLE_KEY!}>
+      <RootLayoutNav />
+    </ClerkProvider>
+
+  ) 
 }
 
 function RootLayoutNav() {
   const colorScheme = useColorScheme();
   const router = useRouter();
+  const {isLoaded,isSignedIn} = useAuth();
+
+  useEffect(()=>{
+    if(isLoaded && !isSignedIn) {
+      router.push("/(modals)/login")
+    }
+  },[isLoaded])
   return (
     <Stack>
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
@@ -91,7 +104,7 @@ function RootLayoutNav() {
           ),
           presentation: "modal",
           animation:"fade_from_bottom",
-
+        
           title: "Login or sign up",
           headerTitleStyle: {
             fontFamily: "mont-sb",
