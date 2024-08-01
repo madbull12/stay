@@ -12,6 +12,7 @@ import { Image } from "expo-image";
 import { AntDesign } from "@expo/vector-icons";
 import { Listing } from "@/app/types";
 import { Link } from "expo-router";
+import Animated, { FadeInRight, FadeOutLeft } from "react-native-reanimated";
 interface Props {
   listings: Listing[];
   category: string;
@@ -86,7 +87,7 @@ const Listings = ({ listings, category }: Props) => {
     }, 500);
   }, [category]);
   return (
-    <View>
+      <Animated.View entering={FadeInRight} exiting={FadeOutLeft}>
       <View style={{ backgroundColor: "white", height: "100%" }}>
         {loading ? (
           <AntDesign name="loading2" size={24} color="black" />
@@ -101,7 +102,8 @@ const Listings = ({ listings, category }: Props) => {
           />
         )}
       </View>
-    </View>
+      </Animated.View>
+      
   );
 };
 
