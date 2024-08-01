@@ -1,9 +1,4 @@
-import FontAwesome from "@expo/vector-icons/FontAwesome";
-import {
-  DarkTheme,
-  DefaultTheme,
-  ThemeProvider,
-} from "@react-navigation/native";
+/// <reference types="nativewind/types" />
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router/stack";
 import * as SplashScreen from "expo-splash-screen";
@@ -12,26 +7,38 @@ import { useEffect } from "react";
 import { useColorScheme } from "@/components/useColorScheme";
 import { TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
+import { Redirect, useRootNavigationState, useRouter } from "expo-router";
 import * as SecureStore from 'expo-secure-store';
-import { ClerkProvider, useAuth } from "@clerk/clerk-expo";
-const CLERK_PUBLISHABLE_KEY = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY
-
+import { ClerkLoaded, ClerkProvider, useAuth } from "@clerk/clerk-expo";
+const CLERK_PUBLISHABLE_KEY = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY!
+if (!CLERK_PUBLISHABLE_KEY) {
+  throw new Error(
+    'Missing Publishable Key. Please set EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY in your .env',
+  )
+}
 const tokenCache = {
-  async getToken(key:string) {
+  async getToken(key: string) {
     try {
-      return SecureStore.getItemAsync(key)
-    }catch(err) {
-      return null;
+      const item = await SecureStore.getItemAsync(key)
+      if (item) {
+        console.log(`${key} was used 🔐 \n`)
+      } else {
+        console.log('No values stored under key: ' + key)
+      }
+      return item
+    } catch (error) {
+      console.error('SecureStore get item error: ', error)
+      await SecureStore.deleteItemAsync(key)
+      return null
     }
   },
-  async saveToken(key:string,value:string) {
+  async saveToken(key: string, value: string) {
     try {
-      return SecureStore.setItemAsync(key,value)
-    } catch(err) {
-      return;
+      return SecureStore.setItemAsync(key, value)
+    } catch (err) {
+      return
     }
-  }
+  },
 }
 
 export {
@@ -56,6 +63,9 @@ export default function RootLayout() {
     "mont-b": require("../assets/fonts/Montserrat_700Bold.ttf"),
   });
 
+  // const rootNavigationState = useRootNavigationState();
+  
+
   // Expo Router uses Error Boundaries to catch errors in the navigation tree.
   useEffect(() => {
     if (error) throw error;
@@ -67,13 +77,19 @@ export default function RootLayout() {
     }
   }, [loaded]);
 
+
+  // if (!rootNavigationState?.key) return null;
   if (!loaded) {
     return null;
   }
 
   return(
-    <ClerkProvider tokenCache={tokenCache} publishableKey={CLERK_PUBLISHABLE_KEY!}>
+    <ClerkProvider tokenCache={tokenCache} publishableKey={CLERK_PUBLISHABLE_KEY}>
+      <ClerkLoaded>
       <RootLayoutNav />
+
+      </ClerkLoaded>
+
     </ClerkProvider>
 
   ) 
