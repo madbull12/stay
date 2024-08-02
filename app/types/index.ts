@@ -21,7 +21,7 @@ export interface Listing {
     host_id:                        string;
     host_url:                       string;
     host_name:                      string;
-    host_since:                     Date;
+    host_since:                     string;
     host_location:                  string;
     host_about:                     string;
     host_response_time:             string;
