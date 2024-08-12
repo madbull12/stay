@@ -57,15 +57,20 @@ const DetailPage = () => {
   const headerAnimatedStyle = useAnimatedStyle(()=>{
     return {
       opacity:interpolate(
-        scrollOffset.value
+        scrollOffset.value,
+        [0, IMG_HEIGHT / 1.5],
+        [0,1]
       )
     }
   })
 
   useLayoutEffect(() => {
     navigation.setOptions({
+      headerBackground:()=>(
+        <Animated.View className={"bg-white h-[100px] border border-black"} style={headerAnimatedStyle}/>
+      ),
       headerRight: () => (
-        <View className="flex flex-row items-center justify-center gap-4">
+        <View className="flex flex-row items-center justify-center gap-4 ">
           <TouchableOpacity className="w-8 flex justify-center items-center  h-8 rounded-full bg-white" onPress={shareListing}>
             <Ionicons name="share-outline" size={22} color="#000" />
           </TouchableOpacity>
