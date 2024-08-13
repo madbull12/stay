@@ -79,6 +79,11 @@ const DetailPage = () => {
           </TouchableOpacity>
         </View>
       ),
+      headerLeft: () => (
+        <TouchableOpacity className="w-[40px] h-[40px] rounded-full bg-white items-center justify-center justify-center" onPress={() => navigation.goBack()}>
+          <Ionicons name="chevron-back" size={24} color={'#000'} />
+        </TouchableOpacity>
+      ),
     });
   }, []);
 
