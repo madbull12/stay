@@ -18,10 +18,32 @@ export default function ListingMap({listings}:Props) {
   const onMarkerSelected = (item:any)=>{
     router.push(`/listing/${item.properties.id}`)
   }
+
+  const renderCluster = (cluster:any)=>{
+    const { id,geometry,onPress,properties} = cluster;
+    const points = properties.point_count;
+    console.log(cluster)
+    return (
+      <Marker
+      onPress={onPress}
+        key={`clust-${id}`}
+        coordinate={{
+          latitude:geometry.coordinates[1],
+          longitude:geometry.coordinates[0]
+        }}
+      >
+        <View className='bg-white rounded-full px-3 py-1 items-center justify-center'>
+          <Text className='font-bold'>
+            {points}
+          </Text>
+        </View>
+      </Marker>
+    )
+  }
   
   return (
     <View className='flex-1'>
-      <MapView clusterColor='#513eff' clusterTextColor='#fff' initialRegion={INITIAL_REGION} showsMyLocationButton provider={PROVIDER_GOOGLE} showsUserLocation style={StyleSheet.absoluteFill}>
+      <MapView renderCluster={renderCluster} clusterColor='#513eff' clusterTextColor='#fff' initialRegion={INITIAL_REGION} showsMyLocationButton provider={PROVIDER_GOOGLE} showsUserLocation style={StyleSheet.absoluteFill}>
         {
           listings.features.map((item:any)=>(
             <Marker

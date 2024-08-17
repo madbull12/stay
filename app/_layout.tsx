@@ -8,38 +8,39 @@ import { useColorScheme } from "@/components/useColorScheme";
 import { TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { Redirect, useRootNavigationState, useRouter } from "expo-router";
-import * as SecureStore from 'expo-secure-store';
+import * as SecureStore from "expo-secure-store";
 import { ClerkLoaded, ClerkProvider, useAuth } from "@clerk/clerk-expo";
-const CLERK_PUBLISHABLE_KEY = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY!
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+const CLERK_PUBLISHABLE_KEY = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY!;
 if (!CLERK_PUBLISHABLE_KEY) {
   throw new Error(
-    'Missing Publishable Key. Please set EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY in your .env',
-  )
+    "Missing Publishable Key. Please set EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY in your .env"
+  );
 }
 const tokenCache = {
   async getToken(key: string) {
     try {
-      const item = await SecureStore.getItemAsync(key)
+      const item = await SecureStore.getItemAsync(key);
       if (item) {
-        console.log(`${key} was used 🔐 \n`)
+        console.log(`${key} was used 🔐 \n`);
       } else {
-        console.log('No values stored under key: ' + key)
+        console.log("No values stored under key: " + key);
       }
-      return item
+      return item;
     } catch (error) {
-      console.error('SecureStore get item error: ', error)
-      await SecureStore.deleteItemAsync(key)
-      return null
+      console.error("SecureStore get item error: ", error);
+      await SecureStore.deleteItemAsync(key);
+      return null;
     }
   },
   async saveToken(key: string, value: string) {
     try {
-      return SecureStore.setItemAsync(key, value)
+      return SecureStore.setItemAsync(key, value);
     } catch (err) {
-      return
+      return;
     }
   },
-}
+};
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -64,7 +65,6 @@ export default function RootLayout() {
   });
 
   // const rootNavigationState = useRootNavigationState();
-  
 
   // Expo Router uses Error Boundaries to catch errors in the navigation tree.
   useEffect(() => {
@@ -77,37 +77,38 @@ export default function RootLayout() {
     }
   }, [loaded]);
 
-
   // if (!rootNavigationState?.key) return null;
   if (!loaded) {
     return null;
   }
 
-  return(
-    <ClerkProvider tokenCache={tokenCache} publishableKey={CLERK_PUBLISHABLE_KEY}>
+  return (
+    <ClerkProvider
+      tokenCache={tokenCache}
+      publishableKey={CLERK_PUBLISHABLE_KEY}
+    >
       <ClerkLoaded>
-      <RootLayoutNav />
-
+        <GestureHandlerRootView style={{ flex: 1 }}>
+          <RootLayoutNav />
+        </GestureHandlerRootView>
       </ClerkLoaded>
-
     </ClerkProvider>
-
-  ) 
+  );
 }
 
 function RootLayoutNav() {
   const colorScheme = useColorScheme();
   const router = useRouter();
-  const {isLoaded,isSignedIn} = useAuth();
+  const { isLoaded, isSignedIn } = useAuth();
 
-  useEffect(()=>{
-    if(isLoaded && !isSignedIn) {
-      router.push("/(modals)/login")
+  useEffect(() => {
+    if (isLoaded && !isSignedIn) {
+      router.push("/(modals)/login");
     }
-  },[isLoaded])
+  }, [isLoaded]);
   return (
     <Stack>
-      <Stack.Screen name="(tabs)" options={{ headerShown:false }} />
+      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       <Stack.Screen
         name="(modals)/login"
         options={{
@@ -119,8 +120,8 @@ function RootLayoutNav() {
             </TouchableOpacity>
           ),
           presentation: "modal",
-          animation:"fade_from_bottom",
-        
+          animation: "fade_from_bottom",
+
           title: "Login or sign up",
           headerTitleStyle: {
             fontFamily: "mont-sb",
@@ -131,7 +132,7 @@ function RootLayoutNav() {
         name="(modals)/bookings"
         options={{
           presentation: "modal",
-          animation:"fade_from_bottom",
+          animation: "fade_from_bottom",
           title: "Bookings",
           headerTitleAlign: "center",
           headerTitleStyle: {
@@ -148,7 +149,7 @@ function RootLayoutNav() {
         name="listing/[id]"
         options={{
           headerTitle: "",
-          headerTransparent:true
+          headerTransparent: true,
         }}
       />
     </Stack>

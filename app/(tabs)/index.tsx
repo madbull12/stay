@@ -7,6 +7,7 @@ import listingsData from "@/assets/data/air-bnb-listings.json";
 import listingsMap from "@/assets/data/air-bnb-listings-map.json";
 import { Listing } from "../types";
 import ListingMap from "@/components/listing-map";
+import ListingBottomSheet from "@/components/listings-bottom-sheet";
 const IndexPage = () => {
   const [category, setCategory] = useState<string>("Tiny homes");
   const items = useMemo<Listing[]>(() => (listingsData as Listing[]).slice(0,50), []);
@@ -29,6 +30,7 @@ const IndexPage = () => {
       
       {/* <Listings category={category} listings={items as Listing[]} /> */}
       <ListingMap listings={listingsMap}  />
+      <ListingBottomSheet listings={items} category={category} />
     </View>
   );
 };
