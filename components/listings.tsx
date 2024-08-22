@@ -4,15 +4,15 @@ import {
   FlatList,
   TouchableOpacity,
   StyleSheet,
-  Button,
 } from "react-native";
 import Feather from "@expo/vector-icons/Feather";
-import React, { useEffect, useRef, useState } from "react";
+import React, { forwardRef, useEffect, useRef, useState } from "react";
 import { Image } from "expo-image";
 import { AntDesign } from "@expo/vector-icons";
 import { Listing } from "@/app/types";
 import { Link } from "expo-router";
 import Animated, { FadeInRight, FadeOutLeft } from "react-native-reanimated";
+import { ScrollView } from "react-native-gesture-handler";
 interface Props {
   listings: Listing[];
   category: string;
@@ -70,16 +70,18 @@ const Item = ({ item }: { item: Listing }) => {
         <Link href={`/listing/${item.id}`}>
           <View className="w-full flex justify-center items-center flex-row h-full space-x-2">
             <Text className="font-bold text-center">View More</Text>
-            <Feather name="chevrons-right" size={16}  color="black" />
+            <Feather name="chevrons-right" size={16} color="black" />
           </View>
         </Link>
       </TouchableOpacity>
     </View>
   );
 };
-const Listings = ({ listings, category }: Props) => {
+const Listings = forwardRef<React.RefObject<FlatList<any>>, Props>(function (
+  { listings, category },
+  ref
+) {
   const [loading, setLoading] = useState(false);
-  const listRef = useRef<FlatList>(null);
   useEffect(() => {
     setLoading(true);
     setTimeout(() => {
@@ -87,25 +89,27 @@ const Listings = ({ listings, category }: Props) => {
     }, 500);
   }, [category]);
   return (
-      <Animated.View entering={FadeInRight} exiting={FadeOutLeft}>
+    <Animated.View entering={FadeInRight} exiting={FadeOutLeft}>
       <View style={{ backgroundColor: "white", height: "100%" }}>
         {loading ? (
           <AntDesign name="loading2" size={24} color="black" />
         ) : (
-          <FlatList
-            style={{
-              padding: 16,
-            }}
-            ref={listRef}
-            data={listings}
-            renderItem={({ item }: { item: Listing }) => <Item item={item} />}
-          />
+          <ScrollView>
+            <FlatList
+              scrollEnabled={false}
+              style={{
+                padding: 16,
+              }}
+              ref={ref}
+              data={listings}
+              renderItem={({ item }: { item: Listing }) => <Item item={item} />}
+            />
+          </ScrollView>
         )}
       </View>
-      </Animated.View>
-      
+    </Animated.View>
   );
-};
+});
 
 const styles = StyleSheet.create({
   container: {
