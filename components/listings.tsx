@@ -6,7 +6,7 @@ import {
   StyleSheet,
 } from "react-native";
 import Feather from "@expo/vector-icons/Feather";
-import React, { forwardRef, useEffect, useRef, useState } from "react";
+import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { Image } from "expo-image";
 import { AntDesign } from "@expo/vector-icons";
 import { Listing } from "@/app/types";
@@ -77,10 +77,27 @@ const Item = ({ item }: { item: Listing }) => {
     </View>
   );
 };
-const Listings = forwardRef<React.RefObject<FlatList<any>>, Props>(function (
+
+
+export type ListRefHandle = {
+  scrollTop:()=>void;
+};
+const Listings = forwardRef<ListRefHandle,Props>(function (
   { listings, category },
   ref
 ) {
+  const listRef = useRef<FlatList>(null);
+  useImperativeHandle(ref, // forwarded ref
+    function () {
+      return {
+        scrollTop() {
+          listRef.current?.scrollToOffset({
+            animated:true,
+            offset:0
+          })
+        }
+      } // the forwarded ref value
+    }, [])
   const [loading, setLoading] = useState(false);
   useEffect(() => {
     setLoading(true);
@@ -95,12 +112,13 @@ const Listings = forwardRef<React.RefObject<FlatList<any>>, Props>(function (
           <AntDesign name="loading2" size={24} color="black" />
         ) : (
           <ScrollView>
-            <FlatList
+            <FlatList 
+              ListHeaderComponent={<Text className="font-bold text-center mb-4 ">{listings.length} homes</Text>}
               scrollEnabled={false}
               style={{
                 padding: 16,
               }}
-              ref={ref}
+              ref={listRef}
               data={listings}
               renderItem={({ item }: { item: Listing }) => <Item item={item} />}
             />
