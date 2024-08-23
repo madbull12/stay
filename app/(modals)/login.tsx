@@ -12,10 +12,8 @@ import Colors from "@/constants/Colors";
 import { Ionicons } from "@expo/vector-icons";
 import { AntDesign } from "@expo/vector-icons";
 import { useOAuth } from "@clerk/clerk-expo";
-import { useRouter } from "expo-router";
 const LoginPage = () => {
   useWarmUpBrowser();
-  const router = useRouter();
   const { startOAuthFlow } = useOAuth({ strategy: "oauth_google" });
   const onPress = React.useCallback(async () => {
     try {
