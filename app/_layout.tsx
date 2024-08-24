@@ -11,6 +11,7 @@ import { Redirect, useRootNavigationState, useRouter } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import { ClerkLoaded, ClerkProvider, useAuth } from "@clerk/clerk-expo";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import BookingHeader from "@/components/booking-header";
 const CLERK_PUBLISHABLE_KEY = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY!;
 if (!CLERK_PUBLISHABLE_KEY) {
   throw new Error(
@@ -108,51 +109,47 @@ function RootLayoutNav() {
   }, [isLoaded]);
   return (
     <Stack>
-      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-      <Stack.Screen
-        name="(modals)/login"
-        options={{
-          headerTitleAlign: "center",
-
-          headerLeft: () => (
-            <TouchableOpacity onPress={() => router.back()}>
-              <Ionicons name="close-outline" size={28} />
-            </TouchableOpacity>
-          ),
-          presentation: "modal",
-          animation: "fade_from_bottom",
-
-          title: "Login or sign up",
-          headerTitleStyle: {
-            fontFamily: "mont-sb",
-          },
-        }}
-      />
-      <Stack.Screen
-        name="(modals)/bookings"
-        options={{
-          presentation: "modal",
-          animation: "fade_from_bottom",
-          title: "Bookings",
-          headerTitleAlign: "center",
-          headerTitleStyle: {
-            fontFamily: "mont-sb",
-          },
-          headerLeft: () => (
-            <TouchableOpacity onPress={() => router.back()}>
-              <Ionicons name="close-outline" size={28} />
-            </TouchableOpacity>
-          ),
-        }}
-      />
-      <Stack.Screen
-        name="listing/[id]"
-        options={{
-          headerTitle: "",
-          headerTransparent: true,
-        }}
-      />
-    </Stack>
+    <Stack.Screen
+      name="(modals)/login"
+      options={{
+        presentation: 'modal',
+        title: 'Log in or sign up',
+        headerTitleStyle: {
+          // fontFamily: 'mon-sb',
+        },
+        headerLeft: () => (
+          <TouchableOpacity onPress={() => router.back()}>
+            <Ionicons name="close-outline" size={28} />
+          </TouchableOpacity>
+        ),
+      }}
+    />
+    <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+    <Stack.Screen name="listing/[id]" options={{ headerTitle: '' }} />
+    <Stack.Screen
+      name="(modals)/bookings"
+      options={{
+        headerBackVisible:false,
+        presentation: 'transparentModal',
+        animation: 'fade',
+        headerTransparent: true,
+        headerTitle: (props) => <BookingHeader />,
+        headerLeft: () => (
+          <TouchableOpacity
+            onPress={() => router.back()}
+            style={{
+              backgroundColor: '#fff',
+              // borderColor: Colors.grey,
+              borderRadius: 20,
+              borderWidth: 1,
+              padding: 4,
+            }}>
+            <Ionicons name="close-outline" size={22} />
+          </TouchableOpacity>
+        ),
+      }}
+    />
+  </Stack>
   );
 }
 

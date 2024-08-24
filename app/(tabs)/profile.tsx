@@ -34,12 +34,13 @@ const ProfilePage = () => {
         firstName,
         lastName
       });
-      setFirstName("");
-      setLastName("");
+ 
     } catch (error) {
       console.log(error)
+    } finally {
+      setEdit(false);
+ 
     }
-    setEdit(false);
   };
   // useEffect(()=>{
 
