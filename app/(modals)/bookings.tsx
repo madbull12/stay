@@ -1,13 +1,34 @@
-import { View, Text, StyleSheet, Platform, Pressable } from "react-native";
-import React from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Platform,
+  Pressable,
+  TextInput,
+  Image,
+} from "react-native";
+import React, { useState } from "react";
 import Colors from "@/constants/Colors";
 import { BlurView } from "expo-blur";
 import { SafeAreaView } from "react-native-safe-area-context";
-import Animated, { SlideInDown } from "react-native-reanimated";
+import Animated, {
+  FadeIn,
+  FadeOut,
+  SlideInDown,
+} from "react-native-reanimated";
 import EvilIcons from "@expo/vector-icons/EvilIcons";
 import { useRouter } from "expo-router";
+import { TouchableOpacity } from "@gorhom/bottom-sheet";
+import { ScrollView } from "react-native-gesture-handler";
+import { Ionicons } from "@expo/vector-icons";
+import { places } from "@/assets/data/places";
+import Feather from "@expo/vector-icons/Feather";
+const AnimatedTouchableOpacity =
+  Animated.createAnimatedComponent(TouchableOpacity);
 const BookingPage = () => {
-  const router = useRouter()
+  const router = useRouter();
+  const [selectedPlace, setSelectedPlace] = useState(1);
+  const [openCard, setOpenCard] = useState(1);
   return (
     <SafeAreaView>
       <View className="relative">
@@ -16,19 +37,72 @@ const BookingPage = () => {
           experimentalBlurMethod={"dimezisBlurView"}
         >
           <View className="space-y-6">
-          <View className="shadow-xl bg-white px-4 shadow-black flex-row items-center h-16 justify-between rounded-lg">
-            <Text className="text-gray-600 font-bold">Where</Text>
-            <Text className="font-bold">I'm flexible</Text>
+            <View className="shadow-xl  bg-white p-4 shadow-black  justify-between rounded-lg">
+              {openCard !== 0 && (
+                <AnimatedTouchableOpacity
+                  onPress={() => setOpenCard(0)}
+                  entering={FadeIn.duration(200)}
+                  exiting={FadeOut.duration(200)}
+                  className='flex-row justify-between w-full'
+                >
+                  <Text className="text-gray-600 font-bold">Where</Text>
+                  <Text className="font-bold">I'm flexible</Text>
+                </AnimatedTouchableOpacity>
+              )}
+              {openCard === 0 && (
+                <Text className="text-2xl font-bold">Where to?</Text>
+              )}
+              {openCard === 0 && (
+                <Animated.View
+                  entering={FadeIn}
+                  exiting={FadeOut}
+                  className="space-y-4"
+                >
+                  <View className="flex-row items-center gap-x-4 mt-4">
+                    <Feather name="search" size={24} color="black" />
+                    <TextInput
+                      className="border-gray-400 border rounded-lg px-4 flex-1"
+                      placeholder="Search destinations"
+                      placeholderTextColor={"gray"}
+                    />
+                  </View>
+
+                  <ScrollView
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    className="gap-x-4"
+                    // contentContainerStyle={styles.placesContainer}
+                  >
+                    {places.map((item, index) => (
+                      <TouchableOpacity
+                        onPress={() => setSelectedPlace(index)}
+                        key={index}
+                      >
+                        <Image
+                          source={item.img}
+                          className={`w-[100px] h-[100px] rounded-lg ${
+                            selectedPlace === index
+                              ? "border-gray-400 border-2"
+                              : ""
+                          }`}
+                          // style={selectedPlace == index ? styles.placeSelected : styles.place}
+                        />
+                        <Text className="mt-2">{item.title}</Text>
+                      </TouchableOpacity>
+                    ))}
+                  </ScrollView>
+                </Animated.View>
+              )}
+            </View>
+            <View className="shadow-xl bg-white px-4 shadow-black flex-row items-center h-16 justify-between rounded-lg">
+              <Text className="text-gray-600 font-bold">When</Text>
+              <Text className="font-bold">Any week</Text>
+            </View>
+            <View className="shadow-xl bg-white px-4 shadow-black flex-row py-4 h-24 justify-between rounded-lg">
+              <Text className=" text-2xl font-bold">Who's coming</Text>
+            </View>
           </View>
-          <View className="shadow-xl bg-white px-4 shadow-black flex-row items-center h-16 justify-between rounded-lg">
-            <Text className="text-gray-600 font-bold">When</Text>
-            <Text className="font-bold">Any week</Text>
-          </View>
-          <View className="shadow-xl bg-white px-4 shadow-black flex-row py-4 h-24 justify-between rounded-lg">
-            <Text className=" text-2xl font-bold">Who's coming</Text>
-          </View>
-          </View>
-  
+
           <Animated.View
             entering={SlideInDown.delay(200)}
             className="absolute p-4 left-0 z-[999] bg-white h-24 bottom-0 right-0 border-t border-gray-200"
@@ -39,8 +113,11 @@ const BookingPage = () => {
                   Clear all
                 </Text>
               </Pressable>
-              <Pressable className="rounded-lg bg-purple-600   px-4 h-10 flex-row items-center" onPress={()=>router.back()}>
-                <EvilIcons name="search" size={24} color="white"  />
+              <Pressable
+                className="rounded-lg bg-purple-600   px-4 h-10 flex-row items-center"
+                onPress={() => router.back()}
+              >
+                <EvilIcons name="search" size={24} color="white" />
                 <Text className="text-white font-bold">Search</Text>
               </Pressable>
             </View>
