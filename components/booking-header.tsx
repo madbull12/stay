@@ -3,8 +3,8 @@ import React from 'react'
 
 const BookingHeader = () => {
   return (
-    <View>
-      <Text className='text-center'>Stays</Text>
+    <View className='justify-center '>
+      <Text className='text-center px-[70px] font-bold text-lg'>Stays</Text>
     </View>
   )
 }
