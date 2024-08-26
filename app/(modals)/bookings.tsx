@@ -179,7 +179,13 @@ const BookingPage = () => {
                         <Text className="text-gray-400">{item.text}</Text>
                       </View>
                       <View className="flex-row gap-x-2 items-center">
-                        <TouchableOpacity>
+                        <TouchableOpacity onPress={()=>{
+                          const newGroups = [...groups];
+                          newGroups[i].count =
+                            newGroups[i].count > 0 ? newGroups[i].count - 1 : 0;
+    
+                          setGroups(newGroups);
+                        }}>
                           <AntDesign
                             name="minuscircleo"
                             size={18}
@@ -187,7 +193,12 @@ const BookingPage = () => {
                           />
                         </TouchableOpacity>
                         <Text>{item.count}</Text>
-                        <TouchableOpacity>
+                        <TouchableOpacity onPress={()=>{
+                          const newGroups = [...groups];
+                          newGroups[i].count++
+                          setGroups(newGroups);
+
+                        }}>
                         <AntDesign name="pluscircleo" size={18} color="black" />
 
                         </TouchableOpacity>
