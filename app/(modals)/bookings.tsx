@@ -8,7 +8,7 @@ import {
   Image,
 } from "react-native";
 import React, { useState } from "react";
-import Colors from "@/constants/Colors";
+import AntDesign from "@expo/vector-icons/AntDesign";
 import { BlurView } from "expo-blur";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Animated, {
@@ -20,15 +20,43 @@ import EvilIcons from "@expo/vector-icons/EvilIcons";
 import { useRouter } from "expo-router";
 import { TouchableOpacity } from "@gorhom/bottom-sheet";
 import { ScrollView } from "react-native-gesture-handler";
-import { Ionicons } from "@expo/vector-icons";
 import { places } from "@/assets/data/places";
 import Feather from "@expo/vector-icons/Feather";
+import DateTimePicker, { DateType } from "react-native-ui-datepicker";
+import dayjs from "dayjs";
 const AnimatedTouchableOpacity =
   Animated.createAnimatedComponent(TouchableOpacity);
 const BookingPage = () => {
   const router = useRouter();
   const [selectedPlace, setSelectedPlace] = useState(1);
-  const [openCard, setOpenCard] = useState(1);
+  const [openCard, setOpenCard] = useState(0);
+  const [date, setDate] = useState(dayjs());
+  const [startDate, setStartDate] = useState<DateType>(dayjs());
+  const [endDate, setEndDate] = useState<DateType>(dayjs());
+  const [groups, setGroups] = useState([
+    {
+      name: "Adults",
+      text: "Ages 13 or above",
+      count: 0,
+    },
+    {
+      name: "Children",
+      text: "Ages 2-12",
+      count: 0,
+    },
+    {
+      name: "Infants",
+      text: "Under 2",
+      count: 0,
+    },
+    {
+      name: "Pets",
+      text: "Pets allowed",
+      count: 0,
+    },
+  ]);
+  let dateNow = new Date();
+  dateNow.setDate(dateNow.getDate() - 1);
   return (
     <SafeAreaView>
       <View className="relative">
@@ -43,15 +71,13 @@ const BookingPage = () => {
                   onPress={() => setOpenCard(0)}
                   entering={FadeIn.duration(200)}
                   exiting={FadeOut.duration(200)}
-                  className='flex-row justify-between w-full'
+                  className="flex-row justify-between w-full"
                 >
                   <Text className="text-gray-600 font-bold">Where</Text>
                   <Text className="font-bold">I'm flexible</Text>
                 </AnimatedTouchableOpacity>
               )}
-              {openCard === 0 && (
-                <Text className="text-2xl font-bold">Where to?</Text>
-              )}
+              {openCard === 0 && <Text>Where to?</Text>}
               {openCard === 0 && (
                 <Animated.View
                   entering={FadeIn}
@@ -71,7 +97,6 @@ const BookingPage = () => {
                     horizontal
                     showsHorizontalScrollIndicator={false}
                     className="gap-x-4"
-                    // contentContainerStyle={styles.placesContainer}
                   >
                     {places.map((item, index) => (
                       <TouchableOpacity
@@ -80,12 +105,13 @@ const BookingPage = () => {
                       >
                         <Image
                           source={item.img}
-                          className={`w-[100px] h-[100px] rounded-lg ${
-                            selectedPlace === index
-                              ? "border-gray-400 border-2"
-                              : ""
-                          }`}
-                          // style={selectedPlace == index ? styles.placeSelected : styles.place}
+                          style={{
+                            width: 100,
+                            height: 100,
+                            borderWidth: selectedPlace === index ? 1 : 0,
+                            borderRadius: 5,
+                            borderColor: "gray",
+                          }}
                         />
                         <Text className="mt-2">{item.title}</Text>
                       </TouchableOpacity>
@@ -94,12 +120,82 @@ const BookingPage = () => {
                 </Animated.View>
               )}
             </View>
-            <View className="shadow-xl bg-white px-4 shadow-black flex-row items-center h-16 justify-between rounded-lg">
-              <Text className="text-gray-600 font-bold">When</Text>
-              <Text className="font-bold">Any week</Text>
+            <View className="shadow-xl bg-white p-4 shadow-black    justify-between rounded-lg">
+              {openCard !== 1 && (
+                <AnimatedTouchableOpacity
+                  className={"flex-row justify-between w-full"}
+                  onPress={() => setOpenCard(1)}
+                  entering={FadeIn.duration(200)}
+                  exiting={FadeOut.duration(200)}
+                >
+                  <Text className="text-gray-600 font-bold">When</Text>
+                  <Text className="font-bold">Any week</Text>
+                </AnimatedTouchableOpacity>
+              )}
+              {openCard == 1 && (
+                <Text className="text-2xl font-bold">When's your trip?</Text>
+              )}
+
+              {openCard == 1 && (
+                <Animated.View>
+                  <DateTimePicker
+                    minDate={dateNow}
+                    mode="range"
+                    // date={date}
+                    startDate={startDate}
+                    endDate={endDate}
+                    onChange={(params) => {
+                      setStartDate(params.startDate);
+                      setEndDate(params.endDate);
+                    }}
+                  />
+                </Animated.View>
+              )}
             </View>
-            <View className="shadow-xl bg-white px-4 shadow-black flex-row py-4 h-24 justify-between rounded-lg">
-              <Text className=" text-2xl font-bold">Who's coming</Text>
+            <View className="shadow-xl bg-white p-4 shadow-black    justify-between rounded-lg">
+              {openCard != 2 && (
+                <AnimatedTouchableOpacity
+                  onPress={() => setOpenCard(2)}
+                  className={"flex-row justify-between w-full"}
+                  entering={FadeIn.duration(200)}
+                  exiting={FadeOut.duration(200)}
+                >
+                  <Text className="text-gray-600 font-bold">Who</Text>
+                  <Text className="font-bold">Guests</Text>
+                </AnimatedTouchableOpacity>
+              )}
+              {openCard === 2 && (
+                <Text className="text-2xl font-bold">Who's coming?</Text>
+              )}
+              {openCard === 2 && (
+                <Animated.View>
+                  {groups.map((item, i) => (
+                    <View
+                      key={i}
+                      className="flex-row items-center py-2 border-b border-gray-300 justify-between"
+                    >
+                      <View>
+                        <Text className="font-semibold">{item.name}</Text>
+                        <Text className="text-gray-400">{item.text}</Text>
+                      </View>
+                      <View className="flex-row gap-x-2 items-center">
+                        <TouchableOpacity>
+                          <AntDesign
+                            name="minuscircleo"
+                            size={18}
+                            color="black"
+                          />
+                        </TouchableOpacity>
+                        <Text>{item.count}</Text>
+                        <TouchableOpacity>
+                        <AntDesign name="pluscircleo" size={18} color="black" />
+
+                        </TouchableOpacity>
+                      </View>
+                    </View>
+                  ))}
+                </Animated.View>
+              )}
             </View>
           </View>
 
